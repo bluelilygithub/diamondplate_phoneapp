@@ -78,8 +78,10 @@ function curam_ct_dashboard_page() {
 
     <script>
     var curamCtAjax = {
-        url:   '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
-        nonce: '<?php echo esc_js( $nonce ); ?>'
+        url:    '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
+        nonce:  '<?php echo esc_js( $nonce ); ?>',
+        apiUrl: '<?php echo esc_js( trailingslashit( get_option( "curam_ct_api_url", "" ) ) ); ?>',
+        apiKey: '<?php echo esc_js( get_option( "curam_ct_api_key", "" ) ); ?>'
     };
     </script>
     <?php

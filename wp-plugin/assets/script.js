@@ -37,6 +37,9 @@
             var sentiment  = call.sentiment  || 'unknown';
             var badgeClass = 'dpct-badge dpct-badge--' + sentiment;
 
+            var apiUrl  = curamCtAjax.apiUrl;
+            var apiKey  = curamCtAjax.apiKey;
+
             var html = '<div class="dpct-detail-grid">'
                 + '<div class="dpct-detail-block">'
                 +   '<h4>Summary</h4>'
@@ -46,6 +49,10 @@
                 +   '<h4>Sentiment</h4>'
                 +   '<span class="' + escHtml(badgeClass) + '">' + escHtml(ucFirst(sentiment)) + '</span>'
                 + '</div>'
+                + '</div>'
+                + '<div class="dpct-detail-block" style="margin-top:16px;">'
+                +   '<h4>Recording</h4>'
+                +   '<audio controls class="dpct-audio" src="' + escHtml(apiUrl) + 'api/calls/' + id + '/audio?api_key=' + escHtml(apiKey) + '"></audio>'
                 + '</div>'
                 + '<div class="dpct-detail-block" style="margin-top:16px;">'
                 +   '<h4>Transcript</h4>'
