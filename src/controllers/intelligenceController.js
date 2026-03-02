@@ -39,12 +39,11 @@ const IntelligenceController = {
       let summary = null;
 
       operatorResults.forEach((result) => {
-        console.log("Operator name:", result.name, "extractedResults:", JSON.stringify(result.extractedResults));
         if (result.name === "Sentiment Analysis") {
-          sentiment = result.extractedResults?.sentiment || null;
+          sentiment = result.predictedLabel || null;
         }
         if (result.name === "Conversation Summary") {
-          summary = result.extractedResults?.summary || null;
+          summary = result.textGenerationResults?.result || null;
         }
       });
 
