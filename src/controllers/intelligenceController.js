@@ -33,10 +33,13 @@ const IntelligenceController = {
         .transcripts(transcript_sid)
         .operatorResults.list();
 
+      console.log("Operator results:", JSON.stringify(operatorResults));
+
       let sentiment = null;
       let summary = null;
 
       operatorResults.forEach((result) => {
+        console.log("Operator name:", result.name, "extractedResults:", JSON.stringify(result.extractedResults));
         if (result.name === "Sentiment Analysis") {
           sentiment = result.extractedResults?.sentiment || null;
         }
@@ -45,9 +48,11 @@ const IntelligenceController = {
         }
       });
 
-      // Update the call record
-      await CallModel.updateTranscript(transcript_sid, transcript, sentiment, summary);
+      console.log("Sentiment:", sentiment, "Summary:", summary);
 
+      // Update the call record
+      const updated = await CallModel.updateTranscript(transcript_sid, transcript, sentiment, summary);
+      console.log("DB update result:", JSON.stringify(updated));
       console.log(`Transcript saved for: ${transcript_sid}`);
     } catch (err) {
       console.error("Failed to process transcript:", err);
