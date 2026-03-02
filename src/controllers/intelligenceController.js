@@ -8,19 +8,19 @@ const IntelligenceController = {
   async transcriptComplete(req, res) {
     console.log("VI webhook received:", JSON.stringify(req.body));
 
-    const { TranscriptSid, Status } = req.body;
+    const { transcript_sid, event_type } = req.body;
 
-    console.log("TranscriptSid:", TranscriptSid, "Status:", Status);
-
-    if (Status !== "completed") {
-      console.log("Ignoring non-completed status:", Status);
+    if (event_type !== "voice_intelligence_transcript_available") {
+      console.log("Ignoring event type:", event_type);
       return res.sendStatus(200);
     }
+
+    console.log("Processing transcript:", transcript_sid);
 
     try {
       // Fetch the full transcript with sentences
       const sentences = await client.intelligence.v2
-        .transcripts(TranscriptSid)
+        .transcripts(transcript_sid)
         .sentences.list();
 
       // Build speaker-labeled transcript
@@ -30,7 +30,7 @@ const IntelligenceController = {
 
       // Fetch operator results (sentiment, summary)
       const operatorResults = await client.intelligence.v2
-        .transcripts(TranscriptSid)
+        .transcripts(transcript_sid)
         .operatorResults.list();
 
       let sentiment = null;
@@ -46,9 +46,9 @@ const IntelligenceController = {
       });
 
       // Update the call record
-      await CallModel.updateTranscript(TranscriptSid, transcript, sentiment, summary);
+      await CallModel.updateTranscript(transcript_sid, transcript, sentiment, summary);
 
-      console.log(`Transcript saved for: ${TranscriptSid}`);
+      console.log(`Transcript saved for: ${transcript_sid}`);
     } catch (err) {
       console.error("Failed to process transcript:", err);
     }
