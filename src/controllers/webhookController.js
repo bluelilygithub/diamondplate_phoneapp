@@ -30,8 +30,12 @@ const WebhookController = {
   async recording(req, res) {
     const { CallSid, RecordingSid, RecordingUrl, RecordingDuration } = req.body;
 
+    console.log("Recording callback received:", { CallSid, RecordingSid, RecordingUrl, RecordingDuration });
+
     try {
       await CallModel.updateRecording(CallSid, RecordingUrl, RecordingDuration);
+
+      console.log("Submitting to Voice Intelligence with RecordingSid:", RecordingSid);
 
       // Submit recording to Voice Intelligence using the Recording SID
       const transcript = await client.intelligence.v2.transcripts.create({
