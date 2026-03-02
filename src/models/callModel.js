@@ -25,14 +25,23 @@ const CallModel = {
     return result.rows[0];
   },
 
-  // Update call with transcript and intelligence data
-  async updateTranscript(callSid, transcript, sentiment, summary) {
+  // Save the Voice Intelligence transcript SID
+  async updateTranscriptSid(callSid, transcriptSid) {
+    const result = await db.query(
+      `UPDATE calls SET transcript_sid = $1 WHERE call_sid = $2 RETURNING *`,
+      [transcriptSid, callSid]
+    );
+    return result.rows[0];
+  },
+
+  // Update call with transcript and intelligence data (matched by transcript_sid)
+  async updateTranscript(transcriptSid, transcript, sentiment, summary) {
     const result = await db.query(
       `UPDATE calls
        SET transcript = $1, sentiment = $2, summary = $3
-       WHERE call_sid = $4
+       WHERE transcript_sid = $4
        RETURNING *`,
-      [transcript, sentiment, summary, callSid]
+      [transcript, sentiment, summary, transcriptSid]
     );
     return result.rows[0];
   },
