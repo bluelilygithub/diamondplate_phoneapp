@@ -12,6 +12,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/webhook", require("./src/routes/webhook"));
+app.use("/webhook/intelligence", require("./src/routes/intelligence"));
 app.use("/api/calls", require("./src/routes/calls"));
 
 const PORT = process.env.PORT || 3000;
