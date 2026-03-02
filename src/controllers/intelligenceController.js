@@ -14,7 +14,7 @@ const IntelligenceController = {
     try {
       // Fetch sentences and operator results in parallel — faster than sequential
       const [sentences, operatorResults] = await Promise.all([
-        client.intelligence.v2.transcripts(transcript_sid).sentences.list(),
+        client.intelligence.v2.transcripts(transcript_sid).sentences.list({ limit: 1000 }),
         client.intelligence.v2.transcripts(transcript_sid).operatorResults.list(),
       ]);
 
