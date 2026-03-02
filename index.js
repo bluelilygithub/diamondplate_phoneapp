@@ -5,14 +5,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Health check — Railway uses this to confirm app is running
+// Health check
 app.get("/", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// Routes (to be built out)
-// app.use("/webhook", require("./src/webhook"));
-// app.use("/api/calls", require("./src/calls"));
+// Routes
+app.use("/webhook", require("./src/routes/webhook"));
+app.use("/api/calls", require("./src/routes/calls"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
