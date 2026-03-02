@@ -6,10 +6,15 @@ const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TO
 const IntelligenceController = {
   // Voice Intelligence calls this when transcription is complete
   async transcriptComplete(req, res) {
+    console.log("VI webhook received:", JSON.stringify(req.body));
+
     const { TranscriptSid, Status } = req.body;
 
+    console.log("TranscriptSid:", TranscriptSid, "Status:", Status);
+
     if (Status !== "completed") {
-      return res.sendStatus(200); // Ignore non-completed events
+      console.log("Ignoring non-completed status:", Status);
+      return res.sendStatus(200);
     }
 
     try {
