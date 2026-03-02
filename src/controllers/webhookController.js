@@ -28,17 +28,17 @@ const WebhookController = {
 
   // Handles recording callback — updates call and submits to Voice Intelligence
   async recording(req, res) {
-    const { CallSid, RecordingUrl, RecordingDuration } = req.body;
+    const { CallSid, RecordingSid, RecordingUrl, RecordingDuration } = req.body;
 
     try {
       await CallModel.updateRecording(CallSid, RecordingUrl, RecordingDuration);
 
-      // Submit recording to Voice Intelligence for transcription
+      // Submit recording to Voice Intelligence using the Recording SID
       const transcript = await client.intelligence.v2.transcripts.create({
         serviceSid: process.env.TWILIO_VOICE_INTELLIGENCE_SID,
         channel: {
           media_properties: {
-            source_sid: CallSid,
+            source_sid: RecordingSid,
           },
         },
       });
