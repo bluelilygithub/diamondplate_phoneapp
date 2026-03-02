@@ -1,7 +1,6 @@
 const db = require("../config/db");
 
 const CallModel = {
-  // Insert a new call record when a call arrives
   async create(callSid, from, to) {
     const result = await db.query(
       `INSERT INTO calls (call_sid, from_number, to_number, status)
@@ -13,7 +12,6 @@ const CallModel = {
     return result.rows[0];
   },
 
-  // Update call with recording details when recording is ready
   async updateRecording(callSid, recordingUrl, duration) {
     const result = await db.query(
       `UPDATE calls
@@ -25,7 +23,6 @@ const CallModel = {
     return result.rows[0];
   },
 
-  // Save the Voice Intelligence transcript SID
   async updateTranscriptSid(callSid, transcriptSid) {
     const result = await db.query(
       `UPDATE calls SET transcript_sid = $1 WHERE call_sid = $2 RETURNING *`,
@@ -34,7 +31,6 @@ const CallModel = {
     return result.rows[0];
   },
 
-  // Update call with transcript and intelligence data (matched by transcript_sid)
   async updateTranscript(transcriptSid, transcript, sentiment, summary) {
     const result = await db.query(
       `UPDATE calls
@@ -46,20 +42,21 @@ const CallModel = {
     return result.rows[0];
   },
 
-  // Get paginated list of calls
   async getAll(page = 1, limit = 20) {
-    const offset = (page - 1) * limit;
+    // Cap limit to prevent large dumps
+    const safLimit  = Math.min(parseInt(limit) || 20, 100);
+    const offset    = (page - 1) * safLimit;
+
     const result = await db.query(
       `SELECT id, call_sid, from_number, to_number, duration, status, sentiment, summary, created_at
        FROM calls
        ORDER BY created_at DESC
        LIMIT $1 OFFSET $2`,
-      [limit, offset]
+      [safLimit, offset]
     );
     return result.rows;
   },
 
-  // Get a single call by ID including full transcript
   async getById(id) {
     const result = await db.query(
       `SELECT * FROM calls WHERE id = $1`,

@@ -2,35 +2,28 @@
     'use strict';
 
     $(document).on('click', '.dpct-row', function () {
-        var $row      = $(this);
-        var id        = $row.data('id');
-        var $detail   = $('#dpct-detail-' + id);
-        var $content  = $detail.find('.dpct-detail-content');
-        var isOpen    = $detail.is(':visible');
+        var $row    = $(this);
+        var id      = $row.data('id');
+        var $detail = $('#dpct-detail-' + id);
+        var $content = $detail.find('.dpct-detail-content');
+        var isOpen  = $detail.is(':visible');
 
-        // Close all other open rows
+        // Close all open rows
         $('.dpct-detail-row').hide();
         $('.dpct-row').removeClass('dpct-row--active');
 
-        if (isOpen) {
-            // Toggle closed
-            return;
-        }
+        if (isOpen) return;
 
-        // Open this row
         $row.addClass('dpct-row--active');
         $detail.show();
 
-        // Load content if not already loaded
-        if ($content.data('loaded') === 'true') {
-            return;
-        }
+        if ($content.data('loaded') === 'true') return;
 
         $content.html('<div class="dpct-loading">Loading call details...</div>');
 
-        $.post(dpctAjax.url, {
-            action: 'dpct_get_call',
-            nonce:  dpctAjax.nonce,
+        $.post(curamCtAjax.url, {
+            action: 'curam_ct_get_call',
+            nonce:  curamCtAjax.nonce,
             id:     id
         }, function (response) {
             if (!response.success) {
@@ -38,7 +31,7 @@
                 return;
             }
 
-            var call      = response.data;
+            var call       = response.data;
             var transcript = call.transcript || '<em>Transcript not yet available.</em>';
             var summary    = call.summary    || '<em>Summary not yet available.</em>';
             var sentiment  = call.sentiment  || 'unknown';
@@ -67,7 +60,7 @@
     });
 
     function escHtml(str) {
-        return $('<div>').text(str).html();
+        return $('<div>').text(String(str)).html();
     }
 
     function ucFirst(str) {
