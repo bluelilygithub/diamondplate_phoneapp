@@ -1,4 +1,4 @@
-const twilio   = require("twilio");
+const twilio    = require("twilio");
 const CallModel = require("../models/callModel");
 
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -6,20 +6,36 @@ const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TO
 const WebhookController = {
   async incoming(req, res) {
     const { CallSid, From, To } = req.body;
+    const mode        = process.env.CALL_MODE || "monitor";
+    const agentNumber = process.env.AGENT_PHONE_NUMBER;
+    const agentName   = process.env.AGENT_NAME || "Agent";
 
     try {
-      await CallModel.create(CallSid, From, To);
+      await CallModel.create(CallSid, From, To, mode, agentName, agentNumber);
     } catch (err) {
       console.error("Failed to create call record:", err.message);
     }
 
     const twiml = new twilio.twiml.VoiceResponse();
-    twiml.say("Thank you for calling. This call will be recorded.");
-    twiml.record({
-      transcribe: false,
-      recordingStatusCallback: `${process.env.APP_URL}/webhook/recording`,
-      recordingStatusCallbackMethod: "POST",
-    });
+
+    if (mode === "voice_record" && agentNumber) {
+      // Two-party mode — greet caller then forward to agent with recording
+      twiml.say("Thank you for calling. Please hold while we connect you.");
+      const dial = twiml.dial({
+        record: "record-from-ringing",
+        recordingStatusCallback: `${process.env.APP_URL}/webhook/recording`,
+        recordingStatusCallbackMethod: "POST",
+      });
+      dial.number(agentNumber);
+    } else {
+      // Monitor mode — record only, no forwarding
+      twiml.say("Thank you for calling. This call will be recorded.");
+      twiml.record({
+        transcribe: false,
+        recordingStatusCallback: `${process.env.APP_URL}/webhook/recording`,
+        recordingStatusCallbackMethod: "POST",
+      });
+    }
 
     res.type("text/xml");
     res.send(twiml.toString());

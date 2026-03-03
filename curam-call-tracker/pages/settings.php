@@ -2,6 +2,10 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 function curam_ct_settings_page() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( 'Unauthorized' );
+    }
+
     if ( isset( $_POST['curam_ct_save'] ) ) {
         check_admin_referer( 'curam_ct_settings_nonce' );
         update_option( 'curam_ct_api_url', sanitize_text_field( $_POST['curam_ct_api_url'] ) );
@@ -14,7 +18,7 @@ function curam_ct_settings_page() {
     ?>
     <div class="wrap dpct-wrap">
         <div class="dpct-header">
-            <h1>⚙️ Settings</h1>
+            <h1>Settings</h1>
             <p class="dpct-subtitle">Configure your Railway API connection</p>
         </div>
 
@@ -53,9 +57,9 @@ function curam_ct_settings_page() {
         <div class="dpct-connection-test">
             <h3>Connection Status</h3>
             <?php if ( isset( $test['error'] ) ) : ?>
-                <span class="dpct-badge dpct-badge--negative">✗ <?php echo esc_html( $test['error'] ); ?></span>
+                <span class="dpct-badge dpct-badge--negative">&times; <?php echo esc_html( $test['error'] ); ?></span>
             <?php else : ?>
-                <span class="dpct-badge dpct-badge--positive">✓ Connected successfully</span>
+                <span class="dpct-badge dpct-badge--positive">&check; Connected successfully</span>
             <?php endif; ?>
         </div>
         <?php endif; ?>

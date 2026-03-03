@@ -2,13 +2,17 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 function curam_ct_dashboard_page() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( 'Unauthorized' );
+    }
+
     $page  = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
     $data  = curam_ct_fetch_calls( $page, 20 );
     $nonce = wp_create_nonce( 'curam_ct_nonce' );
     ?>
     <div class="wrap dpct-wrap">
         <div class="dpct-header">
-            <h1>📞 Call Tracker</h1>
+            <h1>Call Tracker</h1>
             <p class="dpct-subtitle">Inbound call recordings, transcripts &amp; sentiment</p>
         </div>
 
@@ -50,7 +54,7 @@ function curam_ct_dashboard_page() {
                                     <?php echo $sentiment ? esc_html( ucfirst( $sentiment ) ) : 'Pending'; ?>
                                 </span>
                             </td>
-                            <td class="dpct-cell-toggle"><span class="dpct-toggle-icon">▼</span></td>
+                            <td class="dpct-cell-toggle"><span class="dpct-toggle-icon">&#9660;</span></td>
                         </tr>
                         <tr class="dpct-detail-row" id="dpct-detail-<?php echo $id; ?>" style="display:none;">
                             <td colspan="5">
@@ -65,11 +69,11 @@ function curam_ct_dashboard_page() {
 
                 <div class="dpct-pagination">
                     <?php if ( $page > 1 ) : ?>
-                        <a href="<?php echo esc_url( add_query_arg( 'paged', $page - 1 ) ); ?>" class="dpct-btn">← Previous</a>
+                        <a href="<?php echo esc_url( add_query_arg( 'paged', $page - 1 ) ); ?>" class="dpct-btn">&larr; Previous</a>
                     <?php endif; ?>
                     <span>Page <?php echo esc_html( $page ); ?></span>
                     <?php if ( count( $calls ) === 20 ) : ?>
-                        <a href="<?php echo esc_url( add_query_arg( 'paged', $page + 1 ) ); ?>" class="dpct-btn">Next →</a>
+                        <a href="<?php echo esc_url( add_query_arg( 'paged', $page + 1 ) ); ?>" class="dpct-btn">Next &rarr;</a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -78,10 +82,9 @@ function curam_ct_dashboard_page() {
 
     <script>
     var curamCtAjax = {
-        url:    '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
-        nonce:  '<?php echo esc_js( $nonce ); ?>',
-        apiUrl: '<?php echo esc_js( trailingslashit( get_option( "curam_ct_api_url", "" ) ) ); ?>',
-        apiKey: '<?php echo esc_js( get_option( "curam_ct_api_key", "" ) ); ?>'
+        url:      '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
+        nonce:    '<?php echo esc_js( $nonce ); ?>',
+        audioUrl: '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>'
     };
     </script>
     <?php

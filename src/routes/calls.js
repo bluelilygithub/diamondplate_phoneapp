@@ -6,8 +6,9 @@ const AudioController = require("../controllers/audioController");
 
 router.use(auth);
 
-router.get("/",           CallsController.getAll);
-router.get("/:id",        CallsController.getById);
-router.get("/:id/audio",  AudioController.stream);
+router.get("/",               CallsController.getAll);
+router.get("/:id",            CallsController.getById);
+router.get("/:id/audio",      AudioController.stream);
+router.patch("/:id/disposition", CallsController.updateDisposition);
 
 module.exports = router;
